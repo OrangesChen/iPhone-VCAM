@@ -3,6 +3,7 @@
 #import <AVFoundation/AVFoundation.h>
 // #import "util.h"
 
+// 全局变量定义
 static NSFileManager *g_fileManager = nil; // 文件管理对象
 static UIPasteboard *g_pasteboard = nil; // 剪贴板对象
 static BOOL g_canReleaseBuffer = YES; // 当前是否可以释放buffer
@@ -24,14 +25,12 @@ NSString *g_tempFile = @"/var/mobile/Library/Caches/temp.mov"; // 临时文件�
 
 @implementation GetFrame
 + (CMSampleBufferRef _Nullable)getCurrentFrame:(CMSampleBufferRef _Nullable) originSampleBuffer :(BOOL)forceReNew{
-    static AVAssetReader *reader = nil;
-    // static AVAssetReaderTrackOutput *trackout = nil;
-    static AVAssetReaderTrackOutput *videoTrackout_32BGRA = nil;
-    static AVAssetReaderTrackOutput *videoTrackout_420YpCbCr8BiPlanarVideoRange = nil;
-    static AVAssetReaderTrackOutput *videoTrackout_420YpCbCr8BiPlanarFullRange = nil;
-    // static AVAssetReaderTrackOutput *audioTrackout_pcm = nil;
-
-    static CMSampleBufferRef sampleBuffer = nil;
+    // 静态变量定义
+    static AVAssetReader *reader = nil; // 视频读取器
+    static AVAssetReaderTrackOutput *videoTrackout_32BGRA = nil; // BGRA格式输出
+    static AVAssetReaderTrackOutput *videoTrackout_420YpCbCr8BiPlanarVideoRange = nil; // YUV420标清输出
+    static AVAssetReaderTrackOutput *videoTrackout_420YpCbCr8BiPlanarFullRange = nil; // YUV422高清输出
+    static CMSampleBufferRef sampleBuffer = nil; // 采样缓冲区
 
     // origin buffer info
     CMFormatDescriptionRef formatDescription = nil;
@@ -59,6 +58,8 @@ NSString *g_tempFile = @"/var/mobile/Library/Caches/temp.mov"; // 临时文件�
             return originSampleBuffer;
         }
     }
+    NSLog(@"width:%d height:%d ===", dimensions.width, dimensions.height);
+
 
     // 没有替换视频则返回空以使用原来的数据
     if ([g_fileManager fileExistsAtPath:g_tempFile] == NO) return nil;
@@ -125,14 +126,15 @@ NSString *g_tempFile = @"/var/mobile/Library/Caches/temp.mov"; // 临时文件�
             CMSampleBufferCreateCopy(kCFAllocatorDefault, videoTrackout_32BGRA_Buffer, &newsampleBuffer);
             break;
         case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
-            // NSLog(@"--->kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange");
+            // YUV420标清视频格式
             CMSampleBufferCreateCopy(kCFAllocatorDefault, videoTrackout_420YpCbCr8BiPlanarVideoRange_Buffer, &newsampleBuffer);
             break;
         case kCVPixelFormatType_420YpCbCr8BiPlanarFullRange:
-            // NSLog(@"--->kCVPixelFormatType_420YpCbCr8BiPlanarFullRange");
+            // YUV422高清视频格式
             CMSampleBufferCreateCopy(kCFAllocatorDefault, videoTrackout_420YpCbCr8BiPlanarFullRange_Buffer, &newsampleBuffer);
             break;
         default:
+            // 默认使用BGRA格式
             CMSampleBufferCreateCopy(kCFAllocatorDefault, videoTrackout_32BGRA_Buffer, &newsampleBuffer);
     }
     // 释放内存

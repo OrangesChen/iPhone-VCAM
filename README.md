@@ -8,6 +8,19 @@
 
 ## 生效软件
 - 支持绝大多数App
+- 系统相机 (System Camera)
+- 相机 (Message)
+- 网页 (Webkit)
+- QQ
+- TIM
+- Wechat
+- TokTik
+- Telegram (已知问题: 先使用拍照功能，在点右边的录像时，录像会卡顿)
+- Google Translate
+- Youtube
+- Facebook
+- Discord
+- 大多数App都支持......
 
 ## 支持系统版本
 
@@ -18,6 +31,28 @@
 # 开始使用
 
 ## 安装
+1. 需要安装 theos 环境，并配置环境变量 THEOS、THEOS_MAKE_PATH
+```shell
+ $ git clone https://github.com/theos/theos.git
+ $ export THEOS=/Users/xxx/theos
+ $ export THEOS_MAKE_PATH=/Users/xxx/theos/makefiles
+```
+2. 安装 ldid
+```shell
+ $ brew install ldid
+```
+3. 编译，执行 make
+```shell
+ $ make
+```
+4. 拷贝 dylib 文件到 /Library/MobileSubstrate/DynamicLibraries/ 目录下
+```shell
+ $ scp build/TTest.dylib root@IP:/Library/MobileSubstrate/DynamicLibraries/ 
+```
+5. 重启设备
+```shell
+ $ killall SpringBoard
+```
 
 ## 使用
 - 以下 **-** 符号表示 **音量减键**, **+** 表示 **音量加键**, 在一秒内切换点击以触发
